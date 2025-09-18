@@ -2,10 +2,6 @@ package com.example.uccexample.application.dto;
 
 import java.util.List;
 
-/**
- * DTO para la entidad Cliente
- * Utilizado para transferir datos entre capas sin exponer la entidad directamente
- */
 public class ClienteDTO {
     
     private Long idCliente;
@@ -13,17 +9,14 @@ public class ClienteDTO {
     private float presupuesto;
     private List<CarroDTO> carros;
     
-    // Constructor por defecto
     public ClienteDTO() {}
     
-    // Constructor con parámetros
     public ClienteDTO(Long idCliente, String nombre, float presupuesto) {
         this.idCliente = idCliente;
         this.nombre = nombre;
         this.presupuesto = presupuesto;
     }
     
-    // Getters y Setters
     public Long getIdCliente() {
         return idCliente;
     }

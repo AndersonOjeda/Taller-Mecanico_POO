@@ -21,7 +21,6 @@ public class Factura {
     @Column(name = "monto")
     private float monto;
 
-    // Métodos getter y setter
     public Long getIdFactura() {
         return idFactura;
     }

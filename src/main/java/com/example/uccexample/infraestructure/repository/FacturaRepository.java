@@ -77,14 +77,14 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
      * @param fecha la fecha a consultar
      * @return suma total de montos para esa fecha
      */
-    @Query("SELECT SUM(f.monto) FROM Factura f WHERE f.fecha = :fecha")
+    @Query("SELECT SUM(f.monto) FROM com.example.uccexample.infraestructure.modelo.Factura f WHERE f.fecha = :fecha")
     Float calcularTotalPorFecha(@Param("fecha") String fecha);
     
     /**
      * Consulta personalizada para obtener el promedio de montos
      * @return promedio de todos los montos
      */
-    @Query("SELECT AVG(f.monto) FROM Factura f")
+    @Query("SELECT AVG(f.monto) FROM com.example.uccexample.infraestructure.modelo.Factura f")
     Float calcularPromedioMontos();
     
     /**
@@ -93,6 +93,6 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
      * @param fechaFin fecha de fin
      * @return número de facturas en el rango
      */
-    @Query("SELECT COUNT(f) FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin")
+    @Query("SELECT COUNT(f) FROM com.example.uccexample.infraestructure.modelo.Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin")
     Long contarFacturasPorRangoFechas(@Param("fechaInicio") String fechaInicio, @Param("fechaFin") String fechaFin);
 }

@@ -1,9 +1,5 @@
 package com.example.uccexample.application.dto;
 
-/**
- * DTO para la entidad Carro
- * Utilizado para transferir datos entre capas sin exponer la entidad directamente
- */
 public class CarroDTO {
     
     private Long idAuto;
@@ -12,12 +8,10 @@ public class CarroDTO {
     private String estado;
     private String tipo;
     private String costoDano;
-    private Long clienteId; // Solo el ID del cliente para evitar referencias circulares
+    private Long clienteId;
     
-    // Constructor por defecto
     public CarroDTO() {}
     
-    // Constructor con parámetros
     public CarroDTO(Long idAuto, String modelo, int anio, String estado, String tipo, String costoDano, Long clienteId) {
         this.idAuto = idAuto;
         this.modelo = modelo;
@@ -27,8 +21,6 @@ public class CarroDTO {
         this.costoDano = costoDano;
         this.clienteId = clienteId;
     }
-    
-    // Getters y Setters
     public Long getIdAuto() {
         return idAuto;
     }
