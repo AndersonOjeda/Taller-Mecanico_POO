@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-UccexampleApplication<uccexample>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.uccexample.UccexampleApplication",
+            "projectName": "uccexample",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
