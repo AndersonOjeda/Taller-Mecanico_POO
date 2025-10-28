@@ -1,7 +1,5 @@
 package com.example.uccexample.application.service;
 
-import com.example.uccexample.application.dto.ClienteDTO;
-import com.example.uccexample.application.mapper.ClienteMapper;
 import com.example.uccexample.infraestructure.modelo.Cliente;
 import com.example.uccexample.infraestructure.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,47 +16,39 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
     
-    @Autowired
-    private ClienteMapper clienteMapper;
-    
     @Transactional(readOnly = true)
-    public List<ClienteDTO> obtenerTodosLosClientes() {
-        List<Cliente> clientes = clienteRepository.findAll();
-        return clienteMapper.toDTOList(clientes);
+    public List<Cliente> obtenerTodosLosClientes() {
+        return clienteRepository.findAll();
     }
     
     @Transactional(readOnly = true)
-    public Optional<ClienteDTO> obtenerClientePorId(Long id) {
-        Optional<Cliente> cliente = clienteRepository.findById(id);
-        return cliente.map(clienteMapper::toDTO);
+    public Optional<Cliente> obtenerClientePorId(Long id) {
+        return clienteRepository.findById(id);
     }
     
     @Transactional(readOnly = true)
-    public Optional<ClienteDTO> buscarClientePorNombre(String nombre) {
-        Optional<Cliente> cliente = clienteRepository.findByNombre(nombre);
-        return cliente.map(clienteMapper::toDTO);
+    public Optional<Cliente> buscarClientePorNombre(String nombre) {
+        return clienteRepository.findByNombre(nombre);
     }
     
     @Transactional(readOnly = true)
-    public List<ClienteDTO> buscarClientesPorNombreParcial(String nombre) {
-        List<Cliente> clientes = clienteRepository.findByNombreContainingIgnoreCase(nombre);
-        return clienteMapper.toDTOList(clientes);
+    public List<Cliente> buscarClientesPorNombreParcial(String nombre) {
+        return clienteRepository.findByNombreContainingIgnoreCase(nombre);
     }
     
-    public ClienteDTO crearCliente(ClienteDTO clienteDTO) {
-        Cliente cliente = clienteMapper.toEntity(clienteDTO);
-        Cliente clienteGuardado = clienteRepository.save(cliente);
-        return clienteMapper.toDTO(clienteGuardado);
+    public void crearCliente(String nombre, String email) {
+        Cliente cliente = new Cliente();
+        cliente.setNombre(nombre);
+        // Nota: email no está en el modelo Cliente, solo se usa nombre
+        clienteRepository.save(cliente);
     }
     
-    public Optional<ClienteDTO> actualizarCliente(Long id, ClienteDTO clienteDTO) {
-        return clienteRepository.findById(id)
-                .map(clienteExistente -> {
-                    clienteExistente.setNombre(clienteDTO.getNombre());
-                    clienteExistente.setPresupuesto(clienteDTO.getPresupuesto());
-                    
-                    Cliente clienteActualizado = clienteRepository.save(clienteExistente);
-                    return clienteMapper.toDTO(clienteActualizado);
+    public void actualizarCliente(Long id, String nombre, String email) {
+        clienteRepository.findById(id)
+                .ifPresent(clienteExistente -> {
+                    clienteExistente.setNombre(nombre);
+                    // Nota: email no está en el modelo Cliente, solo se usa nombre
+                    clienteRepository.save(clienteExistente);
                 });
     }
     
@@ -71,13 +61,17 @@ public class ClienteService {
     }
     
     @Transactional(readOnly = true)
-    public List<ClienteDTO> obtenerClientesConCarros() {
-        List<Cliente> clientes = clienteRepository.findClientesConCarros();
-        return clienteMapper.toDTOList(clientes);
+    public List<Cliente> obtenerClientesConCarros() {
+        return clienteRepository.findClientesConCarros();
     }
     
     @Transactional(readOnly = true)
     public Long contarCarrosDelCliente(Long clienteId) {
         return clienteRepository.countCarrosByClienteId(clienteId);
+    }
+    
+    @Transactional(readOnly = true)
+    public boolean existeCliente(Long id) {
+        return clienteRepository.existsById(id);
     }
 }

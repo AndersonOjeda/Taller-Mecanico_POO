@@ -1,128 +1,84 @@
 package com.example.uccexample.application.service;
 
-import com.example.uccexample.application.dto.CarroDTO;
-import com.example.uccexample.application.mapper.CarroMapper;
 import com.example.uccexample.infraestructure.modelo.Carro;
-import com.example.uccexample.infraestructure.modelo.Cliente;
 import com.example.uccexample.infraestructure.repository.CarroRepository;
-import com.example.uccexample.infraestructure.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class CarroService {
     
     @Autowired
     private CarroRepository carroRepository;
     
-    @Autowired
-    private ClienteRepository clienteRepository;
-    
-    @Autowired
-    private CarroMapper carroMapper;
-    
-    @Transactional(readOnly = true)
-    public List<CarroDTO> obtenerTodosLosCarros() {
-        List<Carro> carros = carroRepository.findAll();
-        return carroMapper.toDTOList(carros);
+    public List<Carro> obtenerTodosLosCarros() {
+        return carroRepository.findAll();
     }
     
-    @Transactional(readOnly = true)
-    public Optional<CarroDTO> obtenerCarroPorId(Long id) {
-        Optional<Carro> carro = carroRepository.findById(id);
-        return carro.map(carroMapper::toDTO);
+    public Optional<Carro> obtenerCarroPorId(Long id) {
+        return carroRepository.findById(id);
     }
     
-    @Transactional(readOnly = true)
-    public List<CarroDTO> buscarCarrosPorTipo(String tipo) {
-        List<Carro> carros = carroRepository.findByTipo(tipo);
-        return carroMapper.toDTOList(carros);
+    public List<Carro> buscarCarrosPorTipo(String tipo) {
+        return carroRepository.findByTipo(tipo);
     }
     
-    @Transactional(readOnly = true)
-    public List<CarroDTO> buscarCarrosPorEstado(String estado) {
-        List<Carro> carros = carroRepository.findByEstado(estado);
-        return carroMapper.toDTOList(carros);
+    public List<Carro> buscarCarrosPorEstado(String estado) {
+        return carroRepository.findByEstado(estado);
     }
     
-    @Transactional(readOnly = true)
-    public List<CarroDTO> buscarCarrosPorModelo(String modelo) {
-        List<Carro> carros = carroRepository.findByModelo(modelo);
-        return carroMapper.toDTOList(carros);
+    public List<Carro> buscarCarrosPorModelo(String modelo) {
+        return carroRepository.findByModelo(modelo);
     }
     
-    @Transactional(readOnly = true)
-    public List<CarroDTO> buscarCarrosPorTipoYModelo(String tipo, String modelo) {
-        List<Carro> carros = carroRepository.findByTipoAndModelo(tipo, modelo);
-        return carroMapper.toDTOList(carros);
+    public List<Carro> buscarCarrosPorTipoYModelo(String tipo, String modelo) {
+        return carroRepository.findByTipoAndModelo(tipo, modelo);
     }
     
-    @Transactional(readOnly = true)
-    public List<CarroDTO> buscarCarrosPorClienteId(Long clienteId) {
-        List<Carro> carros = carroRepository.findByClienteIdCliente(clienteId);
-        return carroMapper.toDTOList(carros);
+    public List<Carro> buscarCarrosPorClienteId(Long clienteId) {
+        return carroRepository.findByClienteIdCliente(clienteId);
     }
     
-    @Transactional(readOnly = true)
-    public List<CarroDTO> buscarCarrosPorAnio(int anio) {
-        List<Carro> carros = carroRepository.findByAnio(anio);
-        return carroMapper.toDTOList(carros);
+    public List<Carro> buscarCarrosPorAnio(int anio) {
+        return carroRepository.findByAnio(anio);
     }
     
-    @Transactional(readOnly = true)
-    public List<CarroDTO> buscarCarrosPorRangoAnios(int anioInicio, int anioFin) {
-        List<Carro> carros = carroRepository.findByAnioBetween(anioInicio, anioFin);
-        return carroMapper.toDTOList(carros);
+    public List<Carro> buscarCarrosPorRangoAnio(int anioInicio, int anioFin) {
+        return carroRepository.findByAnioBetween(anioInicio, anioFin);
     }
     
-    public CarroDTO crearCarro(CarroDTO carroDTO) {
-        Optional<Cliente> clienteOpt = clienteRepository.findById(carroDTO.getClienteId());
-        if (clienteOpt.isEmpty()) {
-            throw new IllegalArgumentException("No existe un cliente con ID: " + carroDTO.getClienteId());
-        }
-        
-        Carro carro = carroMapper.toEntity(carroDTO);
-        carro.setCliente(clienteOpt.get());
-        
-        Carro carroGuardado = carroRepository.save(carro);
-        return carroMapper.toDTO(carroGuardado);
+    public List<Carro> obtenerCarrosConClientePorTipo(String tipo) {
+        return carroRepository.findCarrosConClienteByTipo(tipo);
     }
     
-    public Optional<CarroDTO> actualizarCarro(Long id, CarroDTO carroDTO) {
-        return carroRepository.findById(id)
-                .map(carroExistente -> {
-                    carroExistente.setModelo(carroDTO.getModelo());
-                    carroExistente.setAnio(carroDTO.getAnio());
-                    carroExistente.setEstado(carroDTO.getEstado());
-                    carroExistente.setTipo(carroDTO.getTipo());
-                    carroExistente.setCostoDano(carroDTO.getCostoDano());
-                    
-                    if (carroDTO.getClienteId() != null) {
-                        Optional<Cliente> clienteOpt = clienteRepository.findById(carroDTO.getClienteId());
-                        clienteOpt.ifPresent(carroExistente::setCliente);
-                    }
-                    
-                    Carro carroActualizado = carroRepository.save(carroExistente);
-                    return carroMapper.toDTO(carroActualizado);
+    public void crearCarro(String marca, String modelo, String tipo, Long clienteId) {
+        Carro carro = new Carro();
+        // Nota: marca no existe en el modelo, se usa modelo en su lugar
+        carro.setModelo(modelo);
+        carro.setTipo(tipo);
+        // Nota: clienteId se usaría para establecer la relación con Cliente si fuera necesario
+        carroRepository.save(carro);
+    }
+    
+    public void actualizarCarro(Long id, String marca, String modelo, String tipo, Long clienteId) {
+        carroRepository.findById(id)
+                .ifPresent(carroExistente -> {
+                    // Nota: marca no existe en el modelo, se usa modelo en su lugar
+                    carroExistente.setModelo(modelo);
+                    carroExistente.setTipo(tipo);
+                    // Nota: clienteId se usaría para establecer la relación con Cliente si fuera necesario
+                    carroRepository.save(carroExistente);
                 });
     }
     
-    public boolean eliminarCarro(Long id) {
-        if (carroRepository.existsById(id)) {
-            carroRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public void eliminarCarro(Long id) {
+        carroRepository.deleteById(id);
     }
     
-    @Transactional(readOnly = true)
-    public List<CarroDTO> obtenerCarrosConClientePorTipo(String tipo) {
-        List<Carro> carros = carroRepository.findCarrosConClienteByTipo(tipo);
-        return carroMapper.toDTOList(carros);
+    public boolean existeCarro(Long id) {
+        return carroRepository.existsById(id);
     }
 }

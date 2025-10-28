@@ -1,15 +1,10 @@
 package com.example.uccexample.application.controller;
 
-import com.example.uccexample.application.dto.ClienteDTO;
 import com.example.uccexample.application.service.ClienteService;
-import com.example.uccexample.application.mapper.ClienteMapper;
-import com.example.uccexample.infraestructure.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/clientes")
@@ -19,36 +14,28 @@ public class ClienteController {
     @Autowired
     private ClienteService clienteService;
     
-    @Autowired
-    private ClienteRepository clienteRepository;
-    
-    @Autowired
-    private ClienteMapper clienteMapper;
-    
     @GetMapping
-    public ResponseEntity<List<ClienteDTO>> obtenerTodosLosClientes() {
-        List<ClienteDTO> clientes = clienteService.obtenerTodosLosClientes();
-        return ResponseEntity.ok(clientes);
+    public ResponseEntity<String> obtenerTodosLosClientes() {
+        clienteService.obtenerTodosLosClientes();
+        return ResponseEntity.ok("Operación completada");
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ClienteDTO> obtenerClientePorId(@PathVariable Long id) {
-        Optional<ClienteDTO> cliente = clienteService.obtenerClientePorId(id);
-        return cliente.map(ResponseEntity::ok)
-                     .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<String> obtenerClientePorId(@PathVariable Long id) {
+        clienteService.obtenerClientePorId(id);
+        return ResponseEntity.ok("Operación completada");
     }
     
     @PostMapping
-    public ResponseEntity<ClienteDTO> crearCliente(@RequestBody ClienteDTO clienteDTO) {
-        ClienteDTO nuevoCliente = clienteService.crearCliente(clienteDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoCliente);
+    public ResponseEntity<String> crearCliente(@RequestParam String nombre, @RequestParam String email) {
+        clienteService.crearCliente(nombre, email);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Cliente creado");
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteDTO> actualizarCliente(@PathVariable Long id, @RequestBody ClienteDTO clienteDTO) {
-        Optional<ClienteDTO> clienteActualizado = clienteService.actualizarCliente(id, clienteDTO);
-        return clienteActualizado.map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<String> actualizarCliente(@PathVariable Long id, @RequestParam String nombre, @RequestParam String email) {
+        clienteService.actualizarCliente(id, nombre, email);
+        return ResponseEntity.ok("Cliente actualizado");
     }
     
     @DeleteMapping("/{id}")
@@ -59,5 +46,4 @@ public class ClienteController {
         }
         return ResponseEntity.notFound().build();
     }
-    
 }

@@ -1,98 +1,221 @@
 package com.example.uccexample.infraestructure.repository;
 
+import com.example.uccexample.application.dto.FacturaDTO;
+import com.example.uccexample.application.mapper.FacturaMapper;
 import com.example.uccexample.infraestructure.modelo.Factura;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import com.example.uccexample.application.repository.IFacturaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Repositorio JPA para la entidad Factura
+ * Implementación del repositorio para la entidad Factura
  * Proporciona operaciones CRUD y consultas personalizadas
  */
 @Repository
-public interface FacturaRepository extends JpaRepository<Factura, Long> {
+public class FacturaRepository implements IFacturaRepository {
     
-    /**
-     * Busca facturas por fecha específica
-     * @param fecha la fecha de la factura
-     * @return lista de facturas de esa fecha
-     */
-    List<Factura> findByFecha(String fecha);
+    @PersistenceContext
+    private EntityManager entityManager;
     
-    /**
-     * Busca facturas por rango de fechas
-     * @param fechaInicio fecha de inicio del rango
-     * @param fechaFin fecha de fin del rango
-     * @return lista de facturas en ese rango
-     */
-    List<Factura> findByFechaBetween(String fechaInicio, String fechaFin);
+    @Autowired
+    private FacturaMapper facturaMapper;
     
-    /**
-     * Busca facturas por monto específico
-     * @param monto el monto de la factura
-     * @return lista de facturas con ese monto
-     */
-    List<Factura> findByMonto(float monto);
+    @Override
+    public List<Factura> findAll() {
+        return entityManager.createQuery("SELECT f FROM Factura f", Factura.class).getResultList();
+    }
     
-    /**
-     * Busca facturas por rango de montos
-     * @param montoMinimo monto mínimo
-     * @param montoMaximo monto máximo
-     * @return lista de facturas en ese rango de montos
-     */
-    List<Factura> findByMontoBetween(float montoMinimo, float montoMaximo);
+    @Override
+    public List<FacturaDTO> findAllDTO() {
+        List<Factura> facturas = findAll();
+        return facturaMapper.toDTOList(facturas);
+    }
     
-    /**
-     * Busca facturas con monto mayor al especificado
-     * @param monto monto mínimo
-     * @return lista de facturas con monto mayor
-     */
-    List<Factura> findByMontoGreaterThan(float monto);
+    @Override
+    public Optional<Factura> findById(Long id) {
+        Factura factura = entityManager.find(Factura.class, id);
+        return Optional.ofNullable(factura);
+    }
     
-    /**
-     * Busca facturas con monto menor al especificado
-     * @param monto monto máximo
-     * @return lista de facturas con monto menor
-     */
-    List<Factura> findByMontoLessThan(float monto);
+    @Override
+    public Optional<FacturaDTO> findByIdDTO(Long id) {
+        Optional<Factura> factura = findById(id);
+        return factura.map(facturaMapper::toDTO);
+    }
     
-    /**
-     * Busca facturas ordenadas por fecha descendente
-     * @return lista de facturas ordenadas por fecha
-     */
-    List<Factura> findAllByOrderByFechaDesc();
+    @Override
+    public Factura save(Factura factura) {
+        if (factura.getIdFactura() == null) {
+            entityManager.persist(factura);
+            return factura;
+        } else {
+            return entityManager.merge(factura);
+        }
+    }
     
-    /**
-     * Busca facturas ordenadas por monto descendente
-     * @return lista de facturas ordenadas por monto
-     */
-    List<Factura> findAllByOrderByMontoDesc();
+    @Override
+    public FacturaDTO saveDTO(FacturaDTO facturaDTO) {
+        Factura factura = facturaMapper.toEntity(facturaDTO);
+        Factura facturaGuardada = save(factura);
+        return facturaMapper.toDTO(facturaGuardada);
+    }
     
-    /**
-     * Consulta personalizada para calcular el total de facturas por fecha
-     * @param fecha la fecha a consultar
-     * @return suma total de montos para esa fecha
-     */
-    @Query("SELECT SUM(f.monto) FROM com.example.uccexample.infraestructure.modelo.Factura f WHERE f.fecha = :fecha")
-    Float calcularTotalPorFecha(@Param("fecha") String fecha);
+    @Override
+    public void deleteById(Long id) {
+        Factura factura = entityManager.find(Factura.class, id);
+        if (factura != null) {
+            entityManager.remove(factura);
+        }
+    }
     
-    /**
-     * Consulta personalizada para obtener el promedio de montos
-     * @return promedio de todos los montos
-     */
-    @Query("SELECT AVG(f.monto) FROM com.example.uccexample.infraestructure.modelo.Factura f")
-    Float calcularPromedioMontos();
+    @Override
+    public boolean existsById(Long id) {
+        Long count = entityManager.createQuery("SELECT COUNT(f) FROM Factura f WHERE f.idFactura = :id", Long.class)
+                .setParameter("id", id)
+                .getSingleResult();
+        return count > 0;
+    }
     
-    /**
-     * Consulta personalizada para contar facturas por rango de fechas
-     * @param fechaInicio fecha de inicio
-     * @param fechaFin fecha de fin
-     * @return número de facturas en el rango
-     */
-    @Query("SELECT COUNT(f) FROM com.example.uccexample.infraestructure.modelo.Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin")
-    Long contarFacturasPorRangoFechas(@Param("fechaInicio") String fechaInicio, @Param("fechaFin") String fechaFin);
+    @Override
+    public List<Factura> findByFecha(String fecha) {
+        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.fecha = :fecha", Factura.class)
+                .setParameter("fecha", fecha)
+                .getResultList();
+    }
+    
+    @Override
+    public List<FacturaDTO> findByFechaDTO(String fecha) {
+        List<Factura> facturas = findByFecha(fecha);
+        return facturaMapper.toDTOList(facturas);
+    }
+    
+    @Override
+    public List<Factura> findByFechaBetween(String fechaInicio, String fechaFin) {
+        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin", Factura.class)
+                .setParameter("fechaInicio", fechaInicio)
+                .setParameter("fechaFin", fechaFin)
+                .getResultList();
+    }
+    
+    @Override
+    public List<FacturaDTO> findByFechaBetweenDTO(String fechaInicio, String fechaFin) {
+        List<Factura> facturas = findByFechaBetween(fechaInicio, fechaFin);
+        return facturaMapper.toDTOList(facturas);
+    }
+    
+    @Override
+    public List<Factura> findByMonto(float monto) {
+        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.monto = :monto", Factura.class)
+                .setParameter("monto", monto)
+                .getResultList();
+    }
+    
+    @Override
+    public List<FacturaDTO> findByMontoDTO(float monto) {
+        List<Factura> facturas = findByMonto(monto);
+        return facturaMapper.toDTOList(facturas);
+    }
+    
+    @Override
+    public List<Factura> findByMontoBetween(float montoMinimo, float montoMaximo) {
+        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.monto BETWEEN :montoMinimo AND :montoMaximo", Factura.class)
+                .setParameter("montoMinimo", montoMinimo)
+                .setParameter("montoMaximo", montoMaximo)
+                .getResultList();
+    }
+    
+    @Override
+    public List<FacturaDTO> findByMontoBetweenDTO(float montoMinimo, float montoMaximo) {
+        List<Factura> facturas = findByMontoBetween(montoMinimo, montoMaximo);
+        return facturaMapper.toDTOList(facturas);
+    }
+    
+    @Override
+    public List<Factura> findByMontoGreaterThan(float monto) {
+        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.monto > :monto", Factura.class)
+                .setParameter("monto", monto)
+                .getResultList();
+    }
+    
+    @Override
+    public List<FacturaDTO> findByMontoGreaterThanDTO(float monto) {
+        List<Factura> facturas = findByMontoGreaterThan(monto);
+        return facturaMapper.toDTOList(facturas);
+    }
+    
+    @Override
+    public List<Factura> findByMontoLessThan(float monto) {
+        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.monto < :monto", Factura.class)
+                .setParameter("monto", monto)
+                .getResultList();
+    }
+    
+    @Override
+    public List<FacturaDTO> findByMontoLessThanDTO(float monto) {
+        List<Factura> facturas = findByMontoLessThan(monto);
+        return facturaMapper.toDTOList(facturas);
+    }
+    
+    @Override
+    public List<Factura> findAllByOrderByFechaDesc() {
+        return entityManager.createQuery("SELECT f FROM Factura f ORDER BY f.fecha DESC", Factura.class)
+                .getResultList();
+    }
+    
+    @Override
+    public List<FacturaDTO> findAllByOrderByFechaDescDTO() {
+        List<Factura> facturas = findAllByOrderByFechaDesc();
+        return facturaMapper.toDTOList(facturas);
+    }
+    
+    @Override
+    public List<Factura> findAllByOrderByMontoDesc() {
+        return entityManager.createQuery("SELECT f FROM Factura f ORDER BY f.monto DESC", Factura.class)
+                .getResultList();
+    }
+    
+    @Override
+    public List<FacturaDTO> findAllByOrderByMontoDescDTO() {
+        List<Factura> facturas = findAllByOrderByMontoDesc();
+        return facturaMapper.toDTOList(facturas);
+    }
+    
+    @Override
+    public Float calcularTotalPorFecha(String fecha) {
+        return entityManager.createQuery("SELECT SUM(f.monto) FROM Factura f WHERE f.fecha = :fecha", Float.class)
+                .setParameter("fecha", fecha)
+                .getSingleResult();
+    }
+    
+    @Override
+    public Float calcularPromedioMontos() {
+        return entityManager.createQuery("SELECT AVG(f.monto) FROM Factura f", Float.class)
+                .getSingleResult();
+    }
+    
+    @Override
+    public Long contarFacturasPorRangoFechas(String fechaInicio, String fechaFin) {
+        return entityManager.createQuery("SELECT COUNT(f) FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin", Long.class)
+                .setParameter("fechaInicio", fechaInicio)
+                .setParameter("fechaFin", fechaFin)
+                .getSingleResult();
+    }
+    
+    @Override
+    public Optional<FacturaDTO> updateDTO(Long id, FacturaDTO facturaDTO) {
+        return findById(id)
+                .map(facturaExistente -> {
+                    facturaExistente.setFecha(facturaDTO.getFecha());
+                    facturaExistente.setMonto(facturaDTO.getMonto());
+                    
+                    Factura facturaActualizada = save(facturaExistente);
+                    return facturaMapper.toDTO(facturaActualizada);
+                });
+    }
 }
