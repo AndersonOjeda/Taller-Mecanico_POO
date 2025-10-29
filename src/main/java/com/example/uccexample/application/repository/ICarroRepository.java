@@ -48,6 +48,10 @@ public interface ICarroRepository {
     
     CarroDTO saveDTO(CarroDTO carroDTO);
     
+    void deleteByIdDTO(Long id);
+    
+    boolean existsByIdDTO(Long id);
+    
     List<CarroDTO> findByTipoDTO(String tipo);
     
     List<CarroDTO> findByEstadoDTO(String estado);

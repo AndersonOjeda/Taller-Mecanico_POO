@@ -37,11 +37,17 @@ public interface IClienteRepository {
     
     ClienteDTO saveDTO(ClienteDTO clienteDTO);
     
+    void deleteByIdDTO(Long id);
+    
+    boolean existsByIdDTO(Long id);
+    
     Optional<ClienteDTO> findByNombreDTO(String nombre);
     
     List<ClienteDTO> findByNombreContainingIgnoreCaseDTO(String nombre);
     
     List<ClienteDTO> findClientesConCarrosDTO();
+    
+    Long countCarrosByClienteIdDTO(Long clienteId);
     
     Optional<ClienteDTO> updateDTO(Long id, ClienteDTO clienteDTO);
 }

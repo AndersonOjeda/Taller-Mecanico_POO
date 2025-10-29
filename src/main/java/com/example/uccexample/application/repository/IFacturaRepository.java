@@ -68,4 +68,14 @@ public interface IFacturaRepository {
     List<FacturaDTO> findAllByOrderByMontoDescDTO();
     
     Optional<FacturaDTO> updateDTO(Long id, FacturaDTO facturaDTO);
+    
+    void deleteByIdDTO(Long id);
+    
+    boolean existsByIdDTO(Long id);
+    
+    Float calcularTotalPorFechaDTO(String fecha);
+    
+    Float calcularPromedioMontosDTO();
+    
+    Long contarFacturasPorRangoFechasDTO(String fechaInicio, String fechaFin);
 }

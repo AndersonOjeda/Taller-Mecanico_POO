@@ -222,4 +222,14 @@ public class CarroRepository implements ICarroRepository {
                     return carroMapper.toDTO(carroActualizado);
                 });
     }
+    
+    @Override
+    public void deleteByIdDTO(Long id) {
+        deleteById(id);
+    }
+    
+    @Override
+    public boolean existsByIdDTO(Long id) {
+        return existsById(id);
+    }
 }

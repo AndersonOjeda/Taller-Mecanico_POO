@@ -186,20 +186,17 @@ public class FacturaRepository implements IFacturaRepository {
         return facturaMapper.toDTOList(facturas);
     }
     
-    @Override
     public Float calcularTotalPorFecha(String fecha) {
         return entityManager.createQuery("SELECT SUM(f.monto) FROM Factura f WHERE f.fecha = :fecha", Float.class)
                 .setParameter("fecha", fecha)
                 .getSingleResult();
     }
     
-    @Override
     public Float calcularPromedioMontos() {
         return entityManager.createQuery("SELECT AVG(f.monto) FROM Factura f", Float.class)
                 .getSingleResult();
     }
     
-    @Override
     public Long contarFacturasPorRangoFechas(String fechaInicio, String fechaFin) {
         return entityManager.createQuery("SELECT COUNT(f) FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin", Long.class)
                 .setParameter("fechaInicio", fechaInicio)
@@ -217,5 +214,30 @@ public class FacturaRepository implements IFacturaRepository {
                     Factura facturaActualizada = save(facturaExistente);
                     return facturaMapper.toDTO(facturaActualizada);
                 });
+    }
+    
+    @Override
+    public void deleteByIdDTO(Long id) {
+        deleteById(id);
+    }
+    
+    @Override
+    public boolean existsByIdDTO(Long id) {
+        return existsById(id);
+    }
+    
+    @Override
+    public Float calcularTotalPorFechaDTO(String fecha) {
+        return calcularTotalPorFecha(fecha);
+    }
+    
+    @Override
+    public Float calcularPromedioMontosDTO() {
+        return calcularPromedioMontos();
+    }
+    
+    @Override
+    public Long contarFacturasPorRangoFechasDTO(String fechaInicio, String fechaFin) {
+        return contarFacturasPorRangoFechas(fechaInicio, fechaFin);
     }
 }

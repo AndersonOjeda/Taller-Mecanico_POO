@@ -145,4 +145,19 @@ public class ClienteRepository implements IClienteRepository {
                     return clienteMapper.toDTO(clienteActualizado);
                 });
     }
+    
+    @Override
+    public void deleteByIdDTO(Long id) {
+        deleteById(id);
+    }
+    
+    @Override
+    public boolean existsByIdDTO(Long id) {
+        return existsById(id);
+    }
+    
+    @Override
+    public Long countCarrosByClienteIdDTO(Long clienteId) {
+        return countCarrosByClienteId(clienteId);
+    }
 }
