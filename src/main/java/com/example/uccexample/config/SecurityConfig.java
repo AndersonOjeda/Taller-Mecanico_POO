@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,30 +18,32 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // CSRF disabled for simple API testing. Consider enabling in production.
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Permitir acceso a H2 console
-                .requestMatchers("/h2-console/**").permitAll()
-                // Permitir el endpoint raíz
+                // Allow the root endpoint without authentication for health checks
                 .requestMatchers("/").permitAll()
-                // El resto requiere autenticación
+                // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
-            // HTTP Basic para facilitar pruebas desde Postman
-            .httpBasic(Customizer.withDefaults())
-            // Configuración necesaria para que H2 console funcione con security
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()));
+            // HTTP Basic for quick testing from Postman or curl
+            .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails user = User
             .withUsername("admin")
-            .password("{noop}admin123") // {noop} para plaintext en pruebas
+            .password(passwordEncoder.encode("admin123"))
             .roles("USER")
             .build();
         return new InMemoryUserDetailsManager(user);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
