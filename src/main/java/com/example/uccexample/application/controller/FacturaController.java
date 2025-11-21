@@ -1,5 +1,6 @@
 package com.example.uccexample.application.controller;
 
+import com.example.uccexample.application.dto.FacturaDTO;
 import com.example.uccexample.application.service.FacturaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,9 +28,9 @@ public class FacturaController {
     }
     
     @PostMapping
-    public ResponseEntity<String> crearFactura(@RequestParam float monto, @RequestParam String fecha) {
+    public ResponseEntity<String> crearFactura(@RequestBody FacturaDTO facturaDTO) {
         try {
-            facturaService.crearFactura(monto, fecha);
+            facturaService.crearFactura(facturaDTO.getMonto(), facturaDTO.getFecha());
             return ResponseEntity.status(HttpStatus.CREATED).body("Factura creada exitosamente");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
@@ -37,9 +38,9 @@ public class FacturaController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<String> actualizarFactura(@PathVariable Long id, @RequestParam float monto, @RequestParam String fecha) {
+    public ResponseEntity<String> actualizarFactura(@PathVariable Long id, @RequestBody FacturaDTO facturaDTO) {
         try {
-            facturaService.actualizarFactura(id, monto, fecha);
+            facturaService.actualizarFactura(id, facturaDTO.getMonto(), facturaDTO.getFecha());
             return ResponseEntity.ok("Factura actualizada exitosamente");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());

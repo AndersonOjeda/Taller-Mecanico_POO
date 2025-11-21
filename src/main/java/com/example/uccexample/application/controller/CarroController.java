@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/carros")
 @CrossOrigin(origins = "*")
@@ -27,13 +29,21 @@ public class CarroController {
     }
     
     @PostMapping
-    public ResponseEntity<String> crearCarro(@RequestParam Long clienteId, @RequestParam String marca, @RequestParam String modelo, @RequestParam String tipo) {
+    public ResponseEntity<String> crearCarro(@RequestBody Map<String, Object> body) {
+        Long clienteId = body.get("clienteId") != null ? Long.valueOf(body.get("clienteId").toString()) : null;
+        String marca = body.get("marca") != null ? body.get("marca").toString() : null;
+        String modelo = body.get("modelo") != null ? body.get("modelo").toString() : null;
+        String tipo = body.get("tipo") != null ? body.get("tipo").toString() : null;
         carroService.crearCarro(marca, modelo, tipo, clienteId);
         return ResponseEntity.status(HttpStatus.CREATED).body("Carro creado");
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<String> actualizarCarro(@PathVariable Long id, @RequestParam Long clienteId, @RequestParam String marca, @RequestParam String modelo, @RequestParam String tipo) {
+    public ResponseEntity<String> actualizarCarro(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        Long clienteId = body.get("clienteId") != null ? Long.valueOf(body.get("clienteId").toString()) : null;
+        String marca = body.get("marca") != null ? body.get("marca").toString() : null;
+        String modelo = body.get("modelo") != null ? body.get("modelo").toString() : null;
+        String tipo = body.get("tipo") != null ? body.get("tipo").toString() : null;
         carroService.actualizarCarro(id, marca, modelo, tipo, clienteId);
         return ResponseEntity.ok("Carro actualizado");
     }
