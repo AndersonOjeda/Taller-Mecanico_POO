@@ -1,13 +1,12 @@
 package com.example.uccexample.application.service;
 
+import com.example.uccexample.application.dto.FacturaDTO;
 import com.example.uccexample.infraestructure.modelo.Factura;
 import com.example.uccexample.infraestructure.repository.FacturaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,54 +16,60 @@ public class FacturaService {
     @Autowired
     private FacturaRepository facturaRepository;
     
-    public List<Factura> obtenerTodasLasFacturas() {
-        return facturaRepository.findAll();
+    public List<FacturaDTO> obtenerTodasLasFacturas() {
+        return facturaRepository.findAllDTO();
     }
     
-    public Optional<Factura> obtenerFacturaPorId(Long id) {
-        return facturaRepository.findById(id);
+    public Optional<FacturaDTO> obtenerFacturaPorId(Long id) {
+        return facturaRepository.findByIdDTO(id);
     }
     
-    public void buscarFacturasPorFecha(String fecha) {
-        facturaRepository.findByFecha(fecha);
+    public List<FacturaDTO> buscarFacturasPorFecha(String fecha) {
+        return facturaRepository.findByFechaDTO(fecha);
     }
     
-    public void buscarFacturasPorRangoFechas(String fechaInicio, String fechaFin) {
-        facturaRepository.findByFechaBetween(fechaInicio, fechaFin);
+    public List<FacturaDTO> buscarFacturasPorRangoFechas(String fechaInicio, String fechaFin) {
+        return facturaRepository.findByFechaBetweenDTO(fechaInicio, fechaFin);
     }
     
-    public void buscarFacturasPorMonto(float monto) {
-        facturaRepository.findByMonto(monto);
+    public List<FacturaDTO> buscarFacturasPorMonto(float monto) {
+        return facturaRepository.findByMontoDTO(monto);
     }
     
-    public void buscarFacturasPorRangoMontos(float montoMinimo, float montoMaximo) {
-        facturaRepository.findByMontoBetween(montoMinimo, montoMaximo);
+    public List<FacturaDTO> buscarFacturasPorRangoMontos(float montoMinimo, float montoMaximo) {
+        return facturaRepository.findByMontoBetweenDTO(montoMinimo, montoMaximo);
     }
     
-    public void buscarFacturasConMontoMayorA(float monto) {
-        facturaRepository.findByMontoGreaterThan(monto);
+    public List<FacturaDTO> buscarFacturasConMontoMayorA(float monto) {
+        return facturaRepository.findByMontoGreaterThanDTO(monto);
     }
     
-    public void buscarFacturasConMontoMenorA(float monto) {
-        facturaRepository.findByMontoLessThan(monto);
+    public List<FacturaDTO> buscarFacturasConMontoMenorA(float monto) {
+        return facturaRepository.findByMontoLessThanDTO(monto);
     }
     
-    public void obtenerFacturasOrdenadasPorFecha() {
-        facturaRepository.findAllByOrderByFechaDesc();
+    public List<FacturaDTO> obtenerFacturasOrdenadasPorFecha() {
+        return facturaRepository.findAllByOrderByFechaDescDTO();
     }
     
-    public void obtenerFacturasOrdenadasPorMonto() {
-        facturaRepository.findAllByOrderByMontoDesc();
+    public List<FacturaDTO> obtenerFacturasOrdenadasPorMonto() {
+        return facturaRepository.findAllByOrderByMontoDescDTO();
     }
     
-    public void crearFactura(float monto, String fecha) {
-        // Operación simplificada - solo llama al repositorio
-        // En una implementación real, se crearía el objeto Factura aquí
+    public Factura crearFactura(float monto, String fecha) {
+        Factura factura = new Factura();
+        factura.setMonto(monto);
+        factura.setFecha(fecha);
+        return facturaRepository.save(factura);
     }
     
-    public void actualizarFactura(Long id, float monto, String fecha) {
-        // Operación simplificada - solo llama al repositorio
-        // En una implementación real, se actualizaría el objeto Factura aquí
+    public Optional<Factura> actualizarFactura(Long id, float monto, String fecha) {
+        return facturaRepository.findById(id)
+                .map(facturaExistente -> {
+                    facturaExistente.setMonto(monto);
+                    facturaExistente.setFecha(fecha);
+                    return facturaRepository.save(facturaExistente);
+                });
     }
     
     public void eliminarFactura(Long id) {
@@ -75,18 +80,15 @@ public class FacturaService {
         return facturaRepository.existsById(id);
     }
     
-    public void calcularTotalPorFecha(String fecha) {
-        // Operación simplificada - solo llama al repositorio
-        facturaRepository.calcularTotalPorFecha(fecha);
+    public Float calcularTotalPorFecha(String fecha) {
+        return facturaRepository.calcularTotalPorFechaDTO(fecha);
     }
     
-    public void calcularPromedioMontos() {
-        // Operación simplificada - solo llama al repositorio
-        facturaRepository.calcularPromedioMontos();
+    public Float calcularPromedioMontos() {
+        return facturaRepository.calcularPromedioMontosDTO();
     }
     
-    public void contarFacturasPorRangoFechas(String fechaInicio, String fechaFin) {
-        // Operación simplificada - solo llama al repositorio
-        facturaRepository.contarFacturasPorRangoFechas(fechaInicio, fechaFin);
+    public Long contarFacturasPorRangoFechas(String fechaInicio, String fechaFin) {
+        return facturaRepository.contarFacturasPorRangoFechasDTO(fechaInicio, fechaFin);
     }
 }

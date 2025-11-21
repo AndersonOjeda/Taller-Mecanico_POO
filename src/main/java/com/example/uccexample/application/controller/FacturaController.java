@@ -2,10 +2,14 @@ package com.example.uccexample.application.controller;
 
 import com.example.uccexample.application.dto.FacturaDTO;
 import com.example.uccexample.application.service.FacturaService;
+import com.example.uccexample.infraestructure.modelo.Factura;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/facturas")
@@ -16,34 +20,37 @@ public class FacturaController {
     private FacturaService facturaService;
     
     @GetMapping
-    public ResponseEntity<String> obtenerTodasLasFacturas() {
-        facturaService.obtenerTodasLasFacturas();
-        return ResponseEntity.ok("Operación completada");
+    public ResponseEntity<List<FacturaDTO>> obtenerTodasLasFacturas() {
+        return ResponseEntity.ok(facturaService.obtenerTodasLasFacturas());
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<String> obtenerFacturaPorId(@PathVariable Long id) {
-        facturaService.obtenerFacturaPorId(id);
-        return ResponseEntity.ok("Operación completada");
+    public ResponseEntity<FacturaDTO> obtenerFacturaPorId(@PathVariable Long id) {
+        Optional<FacturaDTO> factura = facturaService.obtenerFacturaPorId(id);
+        return factura.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
     
     @PostMapping
-    public ResponseEntity<String> crearFactura(@RequestBody FacturaDTO facturaDTO) {
+    public ResponseEntity<FacturaDTO> crearFactura(@RequestBody FacturaDTO facturaDTO) {
         try {
-            facturaService.crearFactura(facturaDTO.getMonto(), facturaDTO.getFecha());
-            return ResponseEntity.status(HttpStatus.CREATED).body("Factura creada exitosamente");
+            Factura creada = facturaService.crearFactura(facturaDTO.getMonto(), facturaDTO.getFecha());
+            facturaDTO.setIdFactura(creada.getIdFactura());
+            return ResponseEntity.status(HttpStatus.CREATED).body(facturaDTO);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<String> actualizarFactura(@PathVariable Long id, @RequestBody FacturaDTO facturaDTO) {
+    public ResponseEntity<FacturaDTO> actualizarFactura(@PathVariable Long id, @RequestBody FacturaDTO facturaDTO) {
         try {
-            facturaService.actualizarFactura(id, facturaDTO.getMonto(), facturaDTO.getFecha());
-            return ResponseEntity.ok("Factura actualizada exitosamente");
+            Optional<Factura> actualizada = facturaService.actualizarFactura(id, facturaDTO.getMonto(), facturaDTO.getFecha());
+            return actualizada.map(f -> {
+                facturaDTO.setIdFactura(f.getIdFactura());
+                return ResponseEntity.ok(facturaDTO);
+            }).orElseGet(() -> ResponseEntity.notFound().build());
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
     
@@ -54,74 +61,63 @@ public class FacturaController {
     }
     
     @GetMapping("/buscar/fecha/{fecha}")
-    public ResponseEntity<String> buscarFacturasPorFecha(@PathVariable String fecha) {
-        facturaService.buscarFacturasPorFecha(fecha);
-        return ResponseEntity.ok("Operación no disponible");
+    public ResponseEntity<List<FacturaDTO>> buscarFacturasPorFecha(@PathVariable String fecha) {
+        return ResponseEntity.ok(facturaService.buscarFacturasPorFecha(fecha));
     }
     
     @GetMapping("/buscar/fecha/{fechaInicio}/{fechaFin}")
-    public ResponseEntity<String> buscarFacturasPorRangoFechas(
+    public ResponseEntity<List<FacturaDTO>> buscarFacturasPorRangoFechas(
             @PathVariable String fechaInicio, 
             @PathVariable String fechaFin) {
-        facturaService.buscarFacturasPorRangoFechas(fechaInicio, fechaFin);
-        return ResponseEntity.ok("Operación no disponible");
+        return ResponseEntity.ok(facturaService.buscarFacturasPorRangoFechas(fechaInicio, fechaFin));
     }
     
     @GetMapping("/buscar/monto/{monto}")
-    public ResponseEntity<String> buscarFacturasPorMonto(@PathVariable float monto) {
-        facturaService.buscarFacturasPorMonto(monto);
-        return ResponseEntity.ok("Operación no disponible");
+    public ResponseEntity<List<FacturaDTO>> buscarFacturasPorMonto(@PathVariable float monto) {
+        return ResponseEntity.ok(facturaService.buscarFacturasPorMonto(monto));
     }
     
     @GetMapping("/buscar/monto/{montoInicio}/{montoFin}")
-    public ResponseEntity<String> buscarFacturasPorRangoMontos(
+    public ResponseEntity<List<FacturaDTO>> buscarFacturasPorRangoMontos(
             @PathVariable float montoInicio, 
             @PathVariable float montoFin) {
-        facturaService.buscarFacturasPorRangoMontos(montoInicio, montoFin);
-        return ResponseEntity.ok("Operación no disponible");
+        return ResponseEntity.ok(facturaService.buscarFacturasPorRangoMontos(montoInicio, montoFin));
     }
     
     @GetMapping("/buscar/monto/mayor/{monto}")
-    public ResponseEntity<String> buscarFacturasConMontoMayorA(@PathVariable float monto) {
-        facturaService.buscarFacturasConMontoMayorA(monto);
-        return ResponseEntity.ok("Operación no disponible");
+    public ResponseEntity<List<FacturaDTO>> buscarFacturasConMontoMayorA(@PathVariable float monto) {
+        return ResponseEntity.ok(facturaService.buscarFacturasConMontoMayorA(monto));
     }
     
     @GetMapping("/buscar/monto/menor/{monto}")
-    public ResponseEntity<String> buscarFacturasConMontoMenorA(@PathVariable float monto) {
-        facturaService.buscarFacturasConMontoMenorA(monto);
-        return ResponseEntity.ok("Operación no disponible");
+    public ResponseEntity<List<FacturaDTO>> buscarFacturasConMontoMenorA(@PathVariable float monto) {
+        return ResponseEntity.ok(facturaService.buscarFacturasConMontoMenorA(monto));
     }
     
     @GetMapping("/ordenar/fecha")
-    public ResponseEntity<String> obtenerFacturasOrdenadasPorFecha() {
-        facturaService.obtenerFacturasOrdenadasPorFecha();
-        return ResponseEntity.ok("Operación no disponible");
+    public ResponseEntity<List<FacturaDTO>> obtenerFacturasOrdenadasPorFecha() {
+        return ResponseEntity.ok(facturaService.obtenerFacturasOrdenadasPorFecha());
     }
     
     @GetMapping("/ordenar/monto")
-    public ResponseEntity<String> obtenerFacturasOrdenadasPorMonto() {
-        facturaService.obtenerFacturasOrdenadasPorMonto();
-        return ResponseEntity.ok("Operación no disponible");
+    public ResponseEntity<List<FacturaDTO>> obtenerFacturasOrdenadasPorMonto() {
+        return ResponseEntity.ok(facturaService.obtenerFacturasOrdenadasPorMonto());
     }
     
     @GetMapping("/estadisticas/total/fecha/{fecha}")
-    public ResponseEntity<String> calcularTotalPorFecha(@PathVariable String fecha) {
-        facturaService.calcularTotalPorFecha(fecha);
-        return ResponseEntity.ok("Operación no disponible");
+    public ResponseEntity<Float> calcularTotalPorFecha(@PathVariable String fecha) {
+        return ResponseEntity.ok(facturaService.calcularTotalPorFecha(fecha));
     }
     
     @GetMapping("/estadisticas/promedio")
-    public ResponseEntity<String> calcularPromedioMontos() {
-        facturaService.calcularPromedioMontos();
-        return ResponseEntity.ok("Operación no disponible");
+    public ResponseEntity<Float> calcularPromedioMontos() {
+        return ResponseEntity.ok(facturaService.calcularPromedioMontos());
     }
     
     @GetMapping("/estadisticas/contar/{fechaInicio}/{fechaFin}")
-    public ResponseEntity<String> contarFacturasPorRangoFechas(
+    public ResponseEntity<Long> contarFacturasPorRangoFechas(
             @PathVariable String fechaInicio, 
             @PathVariable String fechaFin) {
-        facturaService.contarFacturasPorRangoFechas(fechaInicio, fechaFin);
-        return ResponseEntity.ok("Operación no disponible");
+        return ResponseEntity.ok(facturaService.contarFacturasPorRangoFechas(fechaInicio, fechaFin));
     }
 }

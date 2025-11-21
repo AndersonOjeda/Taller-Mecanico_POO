@@ -25,6 +25,9 @@ public class Cliente {
     @Column(name = "presupuesto")
     private float presupuesto;
 
+    @Column(name = "email")
+    private String email;
+
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Carro> carros;
 
@@ -48,6 +51,13 @@ public class Cliente {
     }
     public void setPresupuesto(float presupuesto) { 
         this.presupuesto = presupuesto; 
+    }
+
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public List<Carro> getCarros() { 

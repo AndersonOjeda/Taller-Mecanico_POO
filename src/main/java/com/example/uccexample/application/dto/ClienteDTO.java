@@ -7,6 +7,7 @@ public class ClienteDTO {
     private Long idCliente;
     private String nombre;
     private float presupuesto;
+    private String email;
     private List<CarroDTO> carros;
     
     public ClienteDTO() {}
@@ -39,6 +40,14 @@ public class ClienteDTO {
     
     public void setPresupuesto(float presupuesto) {
         this.presupuesto = presupuesto;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
     
     public List<CarroDTO> getCarros() {
