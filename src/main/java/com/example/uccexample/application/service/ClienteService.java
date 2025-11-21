@@ -1,8 +1,6 @@
 package com.example.uccexample.application.service;
 
-import com.example.uccexample.application.dto.CarroDTO;
 import com.example.uccexample.application.dto.ClienteDTO;
-import com.example.uccexample.application.mapper.CarroMapper;
 import com.example.uccexample.infraestructure.modelo.Carro;
 import com.example.uccexample.infraestructure.modelo.Cliente;
 import com.example.uccexample.infraestructure.repository.ClienteRepository;
@@ -20,9 +18,6 @@ public class ClienteService {
     
     @Autowired
     private ClienteRepository clienteRepository;
-    
-    @Autowired
-    private CarroMapper carroMapper;
     
     @Transactional(readOnly = true)
     public List<Cliente> obtenerTodosLosClientes() {
@@ -62,8 +57,13 @@ public class ClienteService {
 
         if (clienteDTO.getCarros() != null) {
             List<Carro> carros = new ArrayList<>();
-            for (CarroDTO carroDTO : clienteDTO.getCarros()) {
-                Carro carro = carroMapper.toEntity(carroDTO);
+            for (var carroDTO : clienteDTO.getCarros()) {
+                Carro carro = new Carro();
+                carro.setModelo(carroDTO.getModelo());
+                carro.setTipo(carroDTO.getTipo());
+                carro.setEstado(carroDTO.getEstado());
+                carro.setAnio(carroDTO.getAnio());
+                carro.setCostoDano(carroDTO.getCostoDano());
                 carro.setCliente(cliente);
                 carros.add(carro);
             }
@@ -86,8 +86,13 @@ public class ClienteService {
                         } else {
                             clienteExistente.getCarros().clear();
                         }
-                        for (CarroDTO carroDTO : clienteDTO.getCarros()) {
-                            Carro carro = carroMapper.toEntity(carroDTO);
+                        for (var carroDTO : clienteDTO.getCarros()) {
+                            Carro carro = new Carro();
+                            carro.setModelo(carroDTO.getModelo());
+                            carro.setTipo(carroDTO.getTipo());
+                            carro.setEstado(carroDTO.getEstado());
+                            carro.setAnio(carroDTO.getAnio());
+                            carro.setCostoDano(carroDTO.getCostoDano());
                             carro.setCliente(clienteExistente);
                             clienteExistente.getCarros().add(carro);
                         }

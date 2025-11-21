@@ -1,16 +1,14 @@
 package com.example.uccexample.application.mapper;
 
-import com.example.uccexample.application.dto.FacturaDTO;
-import com.example.uccexample.infraestructure.modelo.Factura;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import java.util.List;
+import com.example.uccexample.application.dto.FacturaDTO;
+import com.example.uccexample.infraestructure.modelo.Factura;
 
-/**
- * Mapper para convertir entre la entidad Factura y su DTO
- * Utiliza MapStruct para generar automáticamente las implementaciones
- */
+
 @Mapper(componentModel = "spring")
 public interface FacturaMapper {
     

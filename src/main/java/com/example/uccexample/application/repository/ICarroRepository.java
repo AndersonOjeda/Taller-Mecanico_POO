@@ -1,11 +1,11 @@
 package com.example.uccexample.application.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.example.uccexample.application.dto.CarroDTO;
 import com.example.uccexample.infraestructure.modelo.Carro;
 import com.example.uccexample.infraestructure.modelo.Cliente;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Interfaz para el repositorio de Carro
@@ -41,7 +41,7 @@ public interface ICarroRepository {
     
     List<Carro> findCarrosConClienteByTipo(String tipo);
     
-    // Métodos DTO
+
     List<CarroDTO> findAllDTO();
     
     Optional<CarroDTO> findByIdDTO(Long id);

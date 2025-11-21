@@ -1,15 +1,12 @@
 package com.example.uccexample.application.repository;
 
-import com.example.uccexample.application.dto.FacturaDTO;
-import com.example.uccexample.infraestructure.modelo.Factura;
-
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Interfaz para el repositorio de Factura
- * Define las operaciones de acceso a datos para la entidad Factura
- */
+import com.example.uccexample.application.dto.FacturaDTO;
+import com.example.uccexample.infraestructure.modelo.Factura;
+
+
 public interface IFacturaRepository {
     
     List<Factura> findAll();
@@ -44,7 +41,7 @@ public interface IFacturaRepository {
     
     Long contarFacturasPorRangoFechas(String fechaInicio, String fechaFin);
     
-    // Métodos DTO
+
     List<FacturaDTO> findAllDTO();
     
     Optional<FacturaDTO> findByIdDTO(Long id);

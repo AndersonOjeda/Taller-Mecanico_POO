@@ -1,7 +1,6 @@
 package com.example.uccexample.application.service;
 
 import com.example.uccexample.application.dto.CarroDTO;
-import com.example.uccexample.application.mapper.CarroMapper;
 import com.example.uccexample.infraestructure.modelo.Carro;
 import com.example.uccexample.infraestructure.modelo.Cliente;
 import com.example.uccexample.infraestructure.repository.CarroRepository;
@@ -20,9 +19,6 @@ public class CarroService {
     
     @Autowired
     private ClienteRepository clienteRepository;
-    
-    @Autowired
-    private CarroMapper carroMapper;
     
     public List<Carro> obtenerTodosLosCarros() {
         return carroRepository.findAll();
@@ -105,7 +101,7 @@ public class CarroService {
     }
     
     public Carro crearCarroDesdeDTO(CarroDTO carroDTO) {
-        Carro carro = carroMapper.toEntity(carroDTO);
+        Carro carro = new Carro();
         carro.setModelo(carroDTO.getModelo());
         carro.setTipo(carroDTO.getTipo());
         carro.setEstado(carroDTO.getEstado());

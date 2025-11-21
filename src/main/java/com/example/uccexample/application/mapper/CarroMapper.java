@@ -1,35 +1,25 @@
 package com.example.uccexample.application.mapper;
 
-import com.example.uccexample.application.dto.CarroDTO;
-import com.example.uccexample.infraestructure.modelo.Carro;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import java.util.List;
+import com.example.uccexample.application.dto.CarroDTO;
+import com.example.uccexample.infraestructure.modelo.Carro;
 
-/**
- * Mapper para convertir entre la entidad Carro y su DTO
- * Utiliza MapStruct para generar automáticamente las implementaciones
- */
+
 @Mapper(componentModel = "spring")
 public interface CarroMapper {
     
     CarroMapper INSTANCE = Mappers.getMapper(CarroMapper.class);
     
-    /**
-     * Convierte una entidad Carro a CarroDTO
-     * @param carro la entidad Carro
-     * @return el DTO correspondiente
-     */
+
     @Mapping(source = "cliente.idCliente", target = "clienteId")
     CarroDTO toDTO(Carro carro);
     
-    /**
-     * Convierte un CarroDTO a entidad Carro
-     * @param carroDTO el DTO
-     * @return la entidad correspondiente
-     */
+
     @Mapping(target = "cliente", ignore = true) // Se manejará en el servicio
     Carro toEntity(CarroDTO carroDTO);
     

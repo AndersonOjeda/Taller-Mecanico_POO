@@ -1,15 +1,12 @@
 package com.example.uccexample.application.repository;
 
-import com.example.uccexample.application.dto.ClienteDTO;
-import com.example.uccexample.infraestructure.modelo.Cliente;
-
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Interfaz para el repositorio de Cliente
- * Define las operaciones de acceso a datos para la entidad Cliente
- */
+import com.example.uccexample.application.dto.ClienteDTO;
+import com.example.uccexample.infraestructure.modelo.Cliente;
+
+
 public interface IClienteRepository {
     
     List<Cliente> findAll();
@@ -30,7 +27,7 @@ public interface IClienteRepository {
     
     Long countCarrosByClienteId(Long clienteId);
     
-    // Métodos DTO
+
     List<ClienteDTO> findAllDTO();
     
     Optional<ClienteDTO> findByIdDTO(Long id);
