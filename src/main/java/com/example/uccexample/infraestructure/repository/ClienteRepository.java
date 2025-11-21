@@ -1,14 +1,12 @@
 package com.example.uccexample.infraestructure.repository;
 
-import com.example.uccexample.application.repository.IClienteRepository;
 import com.example.uccexample.application.dto.ClienteDTO;
 import com.example.uccexample.application.mapper.ClienteMapper;
+import com.example.uccexample.application.repository.IClienteRepository;
 import com.example.uccexample.infraestructure.modelo.Cliente;
+import com.example.uccexample.infraestructure.repository.jpa.ClienteJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,17 +17,16 @@ import java.util.Optional;
  */
 @Repository
 public class ClienteRepository implements IClienteRepository {
-    
-    @PersistenceContext
-    private EntityManager entityManager;
-    
+
+    @Autowired
+    private ClienteJpaRepository clienteJpaRepository;
+
     @Autowired
     private ClienteMapper clienteMapper;
     
     @Override
     public List<Cliente> findAll() {
-        TypedQuery<Cliente> query = entityManager.createQuery("SELECT c FROM Cliente c", Cliente.class);
-        return query.getResultList();
+        return clienteJpaRepository.findAll();
     }
     
     @Override
@@ -40,8 +37,7 @@ public class ClienteRepository implements IClienteRepository {
     
     @Override
     public Optional<Cliente> findById(Long id) {
-        Cliente cliente = entityManager.find(Cliente.class, id);
-        return Optional.ofNullable(cliente);
+        return clienteJpaRepository.findById(id);
     }
     
     @Override
@@ -52,12 +48,7 @@ public class ClienteRepository implements IClienteRepository {
     
     @Override
     public Cliente save(Cliente cliente) {
-        if (cliente.getIdCliente() == null) {
-            entityManager.persist(cliente);
-            return cliente;
-        } else {
-            return entityManager.merge(cliente);
-        }
+        return clienteJpaRepository.save(cliente);
     }
     
     @Override
@@ -69,28 +60,17 @@ public class ClienteRepository implements IClienteRepository {
     
     @Override
     public void deleteById(Long id) {
-        Cliente cliente = entityManager.find(Cliente.class, id);
-        if (cliente != null) {
-            entityManager.remove(cliente);
-        }
+        clienteJpaRepository.deleteById(id);
     }
     
     @Override
     public boolean existsById(Long id) {
-        Cliente cliente = entityManager.find(Cliente.class, id);
-        return cliente != null;
+        return clienteJpaRepository.existsById(id);
     }
     
     @Override
     public Optional<Cliente> findByNombre(String nombre) {
-        TypedQuery<Cliente> query = entityManager.createQuery(
-            "SELECT c FROM Cliente c WHERE c.nombre = :nombre", Cliente.class);
-        query.setParameter("nombre", nombre);
-        try {
-            return Optional.of(query.getSingleResult());
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+        return clienteJpaRepository.findByNombre(nombre);
     }
     
     @Override
@@ -101,10 +81,7 @@ public class ClienteRepository implements IClienteRepository {
     
     @Override
     public List<Cliente> findByNombreContainingIgnoreCase(String nombre) {
-        TypedQuery<Cliente> query = entityManager.createQuery(
-            "SELECT c FROM Cliente c WHERE LOWER(c.nombre) LIKE LOWER(:nombre)", Cliente.class);
-        query.setParameter("nombre", "%" + nombre + "%");
-        return query.getResultList();
+        return clienteJpaRepository.findByNombreContainingIgnoreCase(nombre);
     }
     
     @Override
@@ -115,9 +92,7 @@ public class ClienteRepository implements IClienteRepository {
     
     @Override
     public List<Cliente> findClientesConCarros() {
-        TypedQuery<Cliente> query = entityManager.createQuery(
-            "SELECT DISTINCT c FROM Cliente c JOIN c.carros", Cliente.class);
-        return query.getResultList();
+        return clienteJpaRepository.findClientesConCarros();
     }
     
     @Override
@@ -128,10 +103,7 @@ public class ClienteRepository implements IClienteRepository {
     
     @Override
     public Long countCarrosByClienteId(Long clienteId) {
-        TypedQuery<Long> query = entityManager.createQuery(
-            "SELECT COUNT(car) FROM Cliente c JOIN c.carros car WHERE c.idCliente = :clienteId", Long.class);
-        query.setParameter("clienteId", clienteId);
-        return query.getSingleResult();
+        return clienteJpaRepository.countCarrosByClienteId(clienteId);
     }
     
     @Override

@@ -2,14 +2,11 @@ package com.example.uccexample.infraestructure.repository;
 
 import com.example.uccexample.application.dto.FacturaDTO;
 import com.example.uccexample.application.mapper.FacturaMapper;
-import com.example.uccexample.infraestructure.modelo.Factura;
 import com.example.uccexample.application.repository.IFacturaRepository;
+import com.example.uccexample.infraestructure.modelo.Factura;
+import com.example.uccexample.infraestructure.repository.jpa.FacturaJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,15 +17,15 @@ import java.util.Optional;
 @Repository
 public class FacturaRepository implements IFacturaRepository {
     
-    @PersistenceContext
-    private EntityManager entityManager;
-    
+    @Autowired
+    private FacturaJpaRepository facturaJpaRepository;
+
     @Autowired
     private FacturaMapper facturaMapper;
     
     @Override
     public List<Factura> findAll() {
-        return entityManager.createQuery("SELECT f FROM Factura f", Factura.class).getResultList();
+        return facturaJpaRepository.findAll();
     }
     
     @Override
@@ -39,8 +36,7 @@ public class FacturaRepository implements IFacturaRepository {
     
     @Override
     public Optional<Factura> findById(Long id) {
-        Factura factura = entityManager.find(Factura.class, id);
-        return Optional.ofNullable(factura);
+        return facturaJpaRepository.findById(id);
     }
     
     @Override
@@ -51,12 +47,7 @@ public class FacturaRepository implements IFacturaRepository {
     
     @Override
     public Factura save(Factura factura) {
-        if (factura.getIdFactura() == null) {
-            entityManager.persist(factura);
-            return factura;
-        } else {
-            return entityManager.merge(factura);
-        }
+        return facturaJpaRepository.save(factura);
     }
     
     @Override
@@ -68,25 +59,17 @@ public class FacturaRepository implements IFacturaRepository {
     
     @Override
     public void deleteById(Long id) {
-        Factura factura = entityManager.find(Factura.class, id);
-        if (factura != null) {
-            entityManager.remove(factura);
-        }
+        facturaJpaRepository.deleteById(id);
     }
     
     @Override
     public boolean existsById(Long id) {
-        Long count = entityManager.createQuery("SELECT COUNT(f) FROM Factura f WHERE f.idFactura = :id", Long.class)
-                .setParameter("id", id)
-                .getSingleResult();
-        return count > 0;
+        return facturaJpaRepository.existsById(id);
     }
     
     @Override
     public List<Factura> findByFecha(String fecha) {
-        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.fecha = :fecha", Factura.class)
-                .setParameter("fecha", fecha)
-                .getResultList();
+        return facturaJpaRepository.findByFecha(fecha);
     }
     
     @Override
@@ -97,10 +80,7 @@ public class FacturaRepository implements IFacturaRepository {
     
     @Override
     public List<Factura> findByFechaBetween(String fechaInicio, String fechaFin) {
-        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin", Factura.class)
-                .setParameter("fechaInicio", fechaInicio)
-                .setParameter("fechaFin", fechaFin)
-                .getResultList();
+        return facturaJpaRepository.findByFechaBetween(fechaInicio, fechaFin);
     }
     
     @Override
@@ -111,9 +91,7 @@ public class FacturaRepository implements IFacturaRepository {
     
     @Override
     public List<Factura> findByMonto(float monto) {
-        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.monto = :monto", Factura.class)
-                .setParameter("monto", monto)
-                .getResultList();
+        return facturaJpaRepository.findByMonto(monto);
     }
     
     @Override
@@ -124,10 +102,7 @@ public class FacturaRepository implements IFacturaRepository {
     
     @Override
     public List<Factura> findByMontoBetween(float montoMinimo, float montoMaximo) {
-        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.monto BETWEEN :montoMinimo AND :montoMaximo", Factura.class)
-                .setParameter("montoMinimo", montoMinimo)
-                .setParameter("montoMaximo", montoMaximo)
-                .getResultList();
+        return facturaJpaRepository.findByMontoBetween(montoMinimo, montoMaximo);
     }
     
     @Override
@@ -138,9 +113,7 @@ public class FacturaRepository implements IFacturaRepository {
     
     @Override
     public List<Factura> findByMontoGreaterThan(float monto) {
-        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.monto > :monto", Factura.class)
-                .setParameter("monto", monto)
-                .getResultList();
+        return facturaJpaRepository.findByMontoGreaterThan(monto);
     }
     
     @Override
@@ -151,9 +124,7 @@ public class FacturaRepository implements IFacturaRepository {
     
     @Override
     public List<Factura> findByMontoLessThan(float monto) {
-        return entityManager.createQuery("SELECT f FROM Factura f WHERE f.monto < :monto", Factura.class)
-                .setParameter("monto", monto)
-                .getResultList();
+        return facturaJpaRepository.findByMontoLessThan(monto);
     }
     
     @Override
@@ -164,8 +135,7 @@ public class FacturaRepository implements IFacturaRepository {
     
     @Override
     public List<Factura> findAllByOrderByFechaDesc() {
-        return entityManager.createQuery("SELECT f FROM Factura f ORDER BY f.fecha DESC", Factura.class)
-                .getResultList();
+        return facturaJpaRepository.findAllByOrderByFechaDesc();
     }
     
     @Override
@@ -176,8 +146,7 @@ public class FacturaRepository implements IFacturaRepository {
     
     @Override
     public List<Factura> findAllByOrderByMontoDesc() {
-        return entityManager.createQuery("SELECT f FROM Factura f ORDER BY f.monto DESC", Factura.class)
-                .getResultList();
+        return facturaJpaRepository.findAllByOrderByMontoDesc();
     }
     
     @Override
@@ -187,21 +156,15 @@ public class FacturaRepository implements IFacturaRepository {
     }
     
     public Float calcularTotalPorFecha(String fecha) {
-        return entityManager.createQuery("SELECT SUM(f.monto) FROM Factura f WHERE f.fecha = :fecha", Float.class)
-                .setParameter("fecha", fecha)
-                .getSingleResult();
+        return facturaJpaRepository.calcularTotalPorFecha(fecha);
     }
     
     public Float calcularPromedioMontos() {
-        return entityManager.createQuery("SELECT AVG(f.monto) FROM Factura f", Float.class)
-                .getSingleResult();
+        return facturaJpaRepository.calcularPromedioMontos();
     }
     
     public Long contarFacturasPorRangoFechas(String fechaInicio, String fechaFin) {
-        return entityManager.createQuery("SELECT COUNT(f) FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin", Long.class)
-                .setParameter("fechaInicio", fechaInicio)
-                .setParameter("fechaFin", fechaFin)
-                .getSingleResult();
+        return facturaJpaRepository.contarFacturasPorRangoFechas(fechaInicio, fechaFin);
     }
     
     @Override
